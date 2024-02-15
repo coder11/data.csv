@@ -91,9 +91,10 @@
    Valid options are
      :separator (default \\,)
      :quote (default \\\")"
-  [input & options]
-  (let [{:keys [separator quote] :or {separator \, quote \"}} options]
-    (read-csv-from input (int separator) (int quote))))
+  [input & {:keys [separator quote]}]
+  (let [separator (int (or separator \,))
+        quote (int (or quote \"))]
+    (read-csv-from input separator quote)))
 
 
 ;; Writing

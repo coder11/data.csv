@@ -1,6 +1,6 @@
 (ns clojure.data.csv-test
   (:use
-   [clojure.test :only (deftest is)]
+   [clojure.test :only (deftest is testing)]
    [clojure.data.csv :only (read-csv write-csv)])
   (:import
    [java.io Reader StringReader StringWriter EOFException]))
@@ -77,3 +77,27 @@ air, moon roof, loaded\",4799.00")
     (is (= 2 (count csv)))
     (is (= ["Year" "Make" "Model"] (first csv)))
     (is (= ["1997" "Ford" "E350"] (second csv)))))
+
+(deftest read-csv-nils
+  (testing "read-csv should accept nil values passed into options"
+    (is (= [["1" "2" "3"]]
+           (read-csv "1,2,3" :separator nil :quote nil)))
+    (is (= [["1" "2" "3"]]
+           (read-csv "1,2,3" :separator nil)))
+    (is (= [["1" "2" "3"]]
+           (read-csv "1,2,3" :quote nil)))))
+
+(defmacro ^:private test-write-csv
+  [& opts]
+  `(let [string-writer# (StringWriter.)]
+     (write-csv string-writer# [[1 2 3]] ~@opts)
+     (is (= "1,2,3\n"
+            (str string-writer#)))))
+
+(deftest write-csv-nils
+  (testing "write-csv should accept nil values passed into options"
+    (test-write-csv :separator nil :quote nil :quote? nil :newline nil)
+    (test-write-csv :separator nil)
+    (test-write-csv :quote nil)
+    (test-write-csv :quote? nil)
+    (test-write-csv :newline nil)))
